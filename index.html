@@ -21,15 +21,14 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-between pb-12">
 
-    <!-- MODAL LOGIN SHIFT ADMIN -->
+    <!-- MODAL LOGIN SHIFT ADMIN (Hanya Input Sandi) -->
     <div id="shiftLoginModal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
             <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto font-bold text-lg">🔒</div>
-            <h3 class="text-base font-bold text-gray-900">Login Shift Admin & Kasir</h3>
-            <p class="text-xs text-gray-500">Masukkan nama kasir/admin yang bertugas untuk membuka sesi.</p>
-            <input type="text" id="shiftAdminName" placeholder="Nama Admin / Kasir..." class="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-800">
-            <input type="password" id="shiftAdminPass" placeholder="Kata Sandi Shift..." class="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-800">
-            <button onclick="mulaiSesiAdmin()" class="w-full bg-amber-800 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm hover:bg-amber-900">Mulai Shift / Masuk</button>
+            <h3 class="text-base font-bold text-gray-900">Otorisasi Shift Kasir</h3>
+            <p class="text-xs text-gray-500">Masukkan sandi shift Anda untuk membuka sesi operasional.</p>
+            <input type="password" id="shiftAdminPass" placeholder="Masukkan sandi shift..." class="w-full px-3 py-2 border rounded-xl text-xs text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-800">
+            <button onclick="mulaiSesiAdminBySandi()" class="w-full bg-amber-800 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm hover:bg-amber-900">Masuk Sesi</button>
         </div>
     </div>
 
@@ -103,9 +102,9 @@
                 <div id="aiVoiceResponse" class="bg-blue-50 p-3 rounded-xl text-xs text-blue-900 hidden text-left"></div>
             </div>
 
-            <!-- Absensi Karyawan Berbasis ID Card / NIK + GPS + Wajah -->
+            <!-- Absensi Karyawan Berbasis ID Card / NIK -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-                <h3 class="text-xs font-bold text-gray-700 text-center">Absensi Karyawan (Scan / ID Card & Selfie)</h3>
+                <h3 class="text-xs font-bold text-gray-700 text-center">Absensi Karyawan (ID Card / NIK & Selfie)</h3>
                 <input type="text" id="scanInputId" placeholder="Masukkan ID Card / NIK Karyawan..." class="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600">
                 <button onclick="prosesAbsenDenganID()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm transition">
                     📸 Verifikasi ID & Ambil Foto Wajah
@@ -172,27 +171,41 @@
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto space-y-6 text-xs">
             
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-gray-900 text-sm">Panel Master Kontrol & Manajemen Karyawan</h3>
+                <h3 class="font-bold text-gray-900 text-sm">Panel Master Kontrol & Manajemen Shift</h3>
                 <button onclick="tutupMasterPanel()" class="text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
+            </div>
+
+            <!-- Manajemen Admin & Sandi Shift -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">1. Manajemen Shift Admin / Kasir</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="regAdminNama" placeholder="Nama Kasir / Admin" class="px-2 py-1.5 border rounded-lg bg-white">
+                    <input type="text" id="regAdminSandi" placeholder="Sandi Shift Unik" class="px-2 py-1.5 border rounded-lg bg-white">
+                </div>
+                <button onclick="tambahAdminShiftMaster()" class="w-full bg-amber-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Tambahkan Shift Admin</button>
+                <div id="list-admin-box" class="text-[11px] text-gray-600 pt-1">
+                    <span class="font-semibold">Shift Terdaftar:</span> 
+                    <span id="label-jumlah-admin" class="text-amber-800 font-bold">3 Admin</span>
+                </div>
             </div>
 
             <!-- Manajemen Karyawan / ID Card & NIK -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">1. Pendaftaran Data Karyawan (ID Card / NIK)</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">2. Pendaftaran Data Karyawan (ID Card / NIK)</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="regNamaKaryawan" placeholder="Nama Karyawan" class="px-2 py-1.5 border rounded-lg bg-white">
                     <input type="text" id="regIdKaryawan" placeholder="Nomor ID / NIK" class="px-2 py-1.5 border rounded-lg bg-white">
                 </div>
                 <button onclick="tambahKaryawanMaster()" class="w-full bg-amber-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Daftarkan Pegawai</button>
-                <div id="list-pegawai-box" class="text-[11px] text-gray-600 pt-1">
+                <div class="text-[11px] text-gray-600 pt-1">
                     <span class="font-semibold">Pegawai Terdaftar:</span> 
-                    <span id="label-jumlah-pegawai" class="text-amber-800 font-bold">0 Pegawai</span>
+                    <span id="label-jumlah-pegawai" class="text-amber-800 font-bold">2 Pegawai</span>
                 </div>
             </div>
 
             <!-- Branding -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">2. Identitas, Profil & Foto AI Custom</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">3. Identitas, Profil & Foto AI Custom</h4>
                 <div>
                     <label class="block font-semibold mb-1">Nama Usaha:</label>
                     <input type="text" id="inputStoreName" class="w-full px-3 py-2 border rounded-xl bg-white" value="Nouran Coffee & Space">
@@ -213,7 +226,7 @@
 
             <!-- Menu -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">3. Tambah Menu & Foto Produk</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">4. Tambah Menu & Foto Produk</h4>
                 <input type="text" id="newMenuName" placeholder="Nama Menu" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <input type="number" id="newMenuPrice" placeholder="Harga (Rp)" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <input type="file" id="newMenuPhotoFile" accept="image/*" class="w-full text-xs text-gray-500">
@@ -222,7 +235,7 @@
 
             <!-- Pelatihan AI -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">4. Pelatihan AI & Logika Respon Suara</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">5. Pelatihan AI & Logika Respon Suara</h4>
                 <input type="text" id="aiKeyword" placeholder="Kata Kunci (Cth: wifi, jam buka)" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <input type="text" id="aiOpening" placeholder="Kata Pembuka (Cth: Halo kak)" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <textarea id="aiResponse" placeholder="Jawaban Inti AI..." class="w-full px-3 py-2 border rounded-xl bg-white"></textarea>
@@ -231,7 +244,7 @@
 
             <!-- Keuangan -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">5. Manajemen Keuangan & Pengeluaran</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">6. Manajemen Keuangan & Pengeluaran</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="expName" placeholder="Keterangan / Karyawan" class="px-2 py-1.5 border rounded-lg bg-white">
                     <input type="number" id="expCost" placeholder="Nominal (Rp)" class="px-2 py-1.5 border rounded-lg bg-white">
@@ -244,7 +257,7 @@
 
             <!-- Pembayaran -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">6. Pengaturan Pembayaran</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">7. Pengaturan Pembayaran</h4>
                 <input type="text" id="inputBankInfo" class="w-full px-3 py-2 border rounded-xl bg-white" value="BCA 1234567890 a.n Nouran">
                 <input type="file" id="inputQrisFile" accept="image/*" class="w-full text-xs text-gray-500">
             </div>
@@ -265,14 +278,23 @@
     <script>
         let totalPengeluaranBulanIni = 0;
         let adminAktif = "Kasir Umum";
+        
+        let daftarAdminShift = [
+            { nama: "Budi (Shift Pagi)", sandi: "pagi123" },
+            { nama: "Siti (Shift Sore)", sandi: "sore123" },
+            { nama: "Admin Utama", sandi: "ilham2026" }
+        ];
+
         let daftarKaryawan = [
             { nama: "Budi Santoso", idCard: "KRY001" },
             { nama: "Siti Aminah", idCard: "KRY002" }
         ];
+
         let daftarMenu = [
             { nama: "Caffè Latte Artisan", harga: 28000, foto: null },
             { nama: "Croissant Butter", harga: 22000, foto: null }
         ];
+
         let databaseAI = [
             { keyword: "wifi", opening: "Halo kak", response: "untuk password wifi kafe kami bisa ditanyakan langsung ke kasir ya kak." },
             { keyword: "jam buka", opening: "Baik kak", response: "kafe kami buka setiap hari mulai pukul 10.00 pagi sampai 22.00 malam." }
@@ -292,17 +314,26 @@
                 }
             }, 1500);
             renderEtalaseMenu();
+            updateLabelJumlahAdmin();
             updateLabelJumlahPegawai();
         });
 
-        function mulaiSesiAdmin() {
-            const nama = document.getElementById('shiftAdminName').value.trim();
-            if(!nama) { alert("Masukkan nama admin/kasir!"); return; }
-            
-            adminAktif = nama;
-            document.getElementById('active-admin-label').innerText = adminAktif;
-            document.getElementById('inv-admin-name').innerText = adminAktif;
-            document.getElementById('shiftLoginModal').classList.add('hidden');
+        // Otorisasi Shift Admin Cukup Masukkan Sandi Saja
+        function mulaiSesiAdminBySandi() {
+            const inputSandi = document.getElementById('shiftAdminPass').value.trim();
+            if(!inputSandi) { alert("Masukkan sandi shift Anda!"); return; }
+
+            const ditemukan = daftarAdminShift.find(a => a.sandi === inputSandi);
+
+            if (ditemukan) {
+                adminAktif = ditemukan.nama;
+                document.getElementById('active-admin-label').innerText = adminAktif;
+                document.getElementById('inv-admin-name').innerText = adminAktif;
+                document.getElementById('shiftLoginModal').classList.add('hidden');
+            } else {
+                alert("Sandi shift tidak dikenali! Periksa kembali sandi Anda.");
+                document.getElementById('shiftAdminPass').value = '';
+            }
         }
 
         function bukaModalMaster() {
@@ -318,6 +349,24 @@
             document.getElementById('masterPanelModal').classList.add('hidden');
         }
 
+        // Tambah Shift Admin Baru
+        function tambahAdminShiftMaster() {
+            const nama = document.getElementById('regAdminNama').value.trim();
+            const sandi = document.getElementById('regAdminSandi').value.trim();
+            if(!nama || !sandi) { alert("Nama kasir dan sandi shift wajib diisi!"); return; }
+
+            daftarAdminShift.push({ nama, sandi });
+            updateLabelJumlahAdmin();
+            alert(`Shift admin ${nama} berhasil didaftarkan!`);
+            document.getElementById('regAdminNama').value = '';
+            document.getElementById('regAdminSandi').value = '';
+        }
+
+        function updateLabelJumlahAdmin() {
+            const label = document.getElementById('label-jumlah-admin');
+            if(label) label.innerText = `${daftarAdminShift.length} Admin`;
+        }
+
         // Tambah Karyawan Baru
         function tambahKaryawanMaster() {
             const nama = document.getElementById('regNamaKaryawan').value.trim();
@@ -326,14 +375,14 @@
 
             daftarKaryawan.push({ nama, idCard });
             updateLabelJumlahPegawai();
-            alert(`Karyawan ${nama} (${idCard}) berhasil didaftarkan ke sistem!`);
+            alert(`Karyawan ${nama} (${idCard}) berhasil didaftarkan!`);
             document.getElementById('regNamaKaryawan').value = '';
             document.getElementById('regIdKaryawan').value = '';
         }
 
         function updateLabelJumlahPegawai() {
             const label = document.getElementById('label-jumlah-pegawai');
-            if(label) label.innerText = `${daftarKaryawan.length} Pegawai Terdaftar`;
+            if(label) label.innerText = `${daftarKaryawan.length} Pegawai`;
         }
 
         // Kompresor Gambar Anti-Lag
@@ -482,7 +531,7 @@
             document.getElementById('aiResponse').value = '';
         }
 
-        // Proses Validasi ID Card & Buka Kamera Absen Wajah
+        // Proses Validasi ID Card & Kamera Absen Wajah
         function prosesAbsenDenganID() {
             const idInput = document.getElementById('scanInputId').value.trim();
             if(!idInput) { alert("Masukkan ID Card / NIK Anda terlebih dahulu!"); return; }
