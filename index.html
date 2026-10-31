@@ -175,7 +175,7 @@
                 <button onclick="tutupMasterPanel()" class="text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
             </div>
 
-            <!-- Manajemen Admin & Sandi Shift -->
+            <!-- 1. MANAJEMEN SHIFT ADMIN / KASIR (Dilengkapi List & Tombol Hapus/Edit) -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
                 <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">1. Manajemen Shift Admin / Kasir</h4>
                 <div class="grid grid-cols-2 gap-2">
@@ -183,13 +183,15 @@
                     <input type="text" id="regAdminSandi" placeholder="Sandi Shift Unik" class="px-2 py-1.5 border rounded-lg bg-white">
                 </div>
                 <button onclick="tambahAdminShiftMaster()" class="w-full bg-amber-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Tambahkan Shift Admin</button>
-                <div id="list-admin-box" class="text-[11px] text-gray-600 pt-1">
-                    <span class="font-semibold">Shift Terdaftar:</span> 
-                    <span id="label-jumlah-admin" class="text-amber-800 font-bold">3 Admin</span>
+                
+                <!-- Daftar List Admin yang Bisa Diedit/Dihapus -->
+                <div class="mt-2 pt-2 border-t">
+                    <p class="font-semibold text-gray-600 mb-1">Daftar Admin Terdaftar:</p>
+                    <div id="container-list-admin" class="space-y-1.5 max-h-32 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <!-- Manajemen Karyawan / ID Card & NIK -->
+            <!-- 2. PENDAFTARAN DATA KARYAWAN (Dilengkapi List & Tombol Hapus/Edit) -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
                 <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">2. Pendaftaran Data Karyawan (ID Card / NIK)</h4>
                 <div class="grid grid-cols-2 gap-2">
@@ -197,9 +199,11 @@
                     <input type="text" id="regIdKaryawan" placeholder="Nomor ID / NIK" class="px-2 py-1.5 border rounded-lg bg-white">
                 </div>
                 <button onclick="tambahKaryawanMaster()" class="w-full bg-amber-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Daftarkan Pegawai</button>
-                <div class="text-[11px] text-gray-600 pt-1">
-                    <span class="font-semibold">Pegawai Terdaftar:</span> 
-                    <span id="label-jumlah-pegawai" class="text-amber-800 font-bold">2 Pegawai</span>
+                
+                <!-- Daftar List Karyawan yang Bisa Diedit/Dihapus -->
+                <div class="mt-2 pt-2 border-t">
+                    <p class="font-semibold text-gray-600 mb-1">Daftar Pegawai Terdaftar:</p>
+                    <div id="container-list-pegawai" class="space-y-1.5 max-h-32 overflow-y-auto"></div>
                 </div>
             </div>
 
@@ -314,11 +318,10 @@
                 }
             }, 1500);
             renderEtalaseMenu();
-            updateLabelJumlahAdmin();
-            updateLabelJumlahPegawai();
+            renderListAdminMaster();
+            renderListPegawaiMaster();
         });
 
-        // Otorisasi Shift Admin Cukup Masukkan Sandi Saja
         function mulaiSesiAdminBySandi() {
             const inputSandi = document.getElementById('shiftAdminPass').value.trim();
             if(!inputSandi) { alert("Masukkan sandi shift Anda!"); return; }
@@ -340,6 +343,8 @@
             const sandi = prompt("Masukkan sandi master sistem:");
             if (sandi === "ilham2026") {
                 document.getElementById('masterPanelModal').classList.remove('hidden');
+                renderListAdminMaster();
+                renderListPegawaiMaster();
             } else if (sandi !== null) {
                 alert("Kata sandi salah!");
             }
@@ -349,40 +354,104 @@
             document.getElementById('masterPanelModal').classList.add('hidden');
         }
 
-        // Tambah Shift Admin Baru
+        // --- MANAJEMEN ADMIN SHIFT (TAMPIL, EDIT, HAPUS) ---
         function tambahAdminShiftMaster() {
             const nama = document.getElementById('regAdminNama').value.trim();
             const sandi = document.getElementById('regAdminSandi').value.trim();
             if(!nama || !sandi) { alert("Nama kasir dan sandi shift wajib diisi!"); return; }
 
             daftarAdminShift.push({ nama, sandi });
-            updateLabelJumlahAdmin();
-            alert(`Shift admin ${nama} berhasil didaftarkan!`);
+            renderListAdminMaster();
+            alert(`Shift admin ${nama} berhasil ditambahkan!`);
             document.getElementById('regAdminNama').value = '';
             document.getElementById('regAdminSandi').value = '';
         }
 
-        function updateLabelJumlahAdmin() {
-            const label = document.getElementById('label-jumlah-admin');
-            if(label) label.innerText = `${daftarAdminShift.length} Admin`;
+        function hapusAdminMaster(index) {
+            if(confirm(`Yakin ingin menghapus shift admin ini?`)) {
+                daftarAdminShift.splice(index, 1);
+                renderListAdminMaster();
+            }
         }
 
-        // Tambah Karyawan Baru
+        function editAdminMaster(index) {
+            const admin = daftarAdminShift[index];
+            const namaBaru = prompt("Edit Nama Kasir/Admin:", admin.nama);
+            if(namaBaru === null) return;
+            const sandiBaru = prompt("Edit Sandi Shift:", admin.sandi);
+            if(sandiBaru === null) return;
+
+            daftarAdminShift[index] = { nama: namaBaru.trim(), sandi: sandiBaru.trim() };
+            renderListAdminMaster();
+            alert("Data shift admin berhasil diperbarui!");
+        }
+
+        function renderListAdminMaster() {
+            const container = document.getElementById('container-list-admin');
+            if(!container) return;
+            container.innerHTML = '';
+            daftarAdminShift.forEach((admin, index) => {
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center bg-white border p-1.5 rounded-lg text-xs";
+                item.innerHTML = `
+                    <span><b>${admin.nama}</b> (Sandi: ${admin.sandi})</span>
+                    <div class="space-x-1">
+                        <button onclick="editAdminMaster(${index})" class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">Edit</button>
+                        <button onclick="hapusAdminMaster(${index})" class="bg-red-100 text-red-700 px-2 py-0.5 rounded font-semibold">Hapus</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // --- MANAJEMEN KARYAWAN (TAMPIL, EDIT, HAPUS) ---
         function tambahKaryawanMaster() {
             const nama = document.getElementById('regNamaKaryawan').value.trim();
             const idCard = document.getElementById('regIdKaryawan').value.trim();
             if(!nama || !idCard) { alert("Nama dan ID Card / NIK wajib diisi!"); return; }
 
             daftarKaryawan.push({ nama, idCard });
-            updateLabelJumlahPegawai();
-            alert(`Karyawan ${nama} (${idCard}) berhasil didaftarkan!`);
+            renderListPegawaiMaster();
+            alert(`Karyawan ${nama} berhasil didaftarkan!`);
             document.getElementById('regNamaKaryawan').value = '';
             document.getElementById('regIdKaryawan').value = '';
         }
 
-        function updateLabelJumlahPegawai() {
-            const label = document.getElementById('label-jumlah-pegawai');
-            if(label) label.innerText = `${daftarKaryawan.length} Pegawai`;
+        function hapusKaryawanMaster(index) {
+            if(confirm("Yakin ingin menghapus data karyawan ini?")) {
+                daftarKaryawan.splice(index, 1);
+                renderListPegawaiMaster();
+            }
+        }
+
+        function editKaryawanMaster(index) {
+            const kary = daftarKaryawan[index];
+            const namaBaru = prompt("Edit Nama Karyawan:", kary.nama);
+            if(namaBaru === null) return;
+            const idBaru = prompt("Edit Nomor ID / NIK:", kary.idCard);
+            if(idBaru === null) return;
+
+            daftarKaryawan[index] = { nama: namaBaru.trim(), idCard: idBaru.trim() };
+            renderListPegawaiMaster();
+            alert("Data karyawan berhasil diperbarui!");
+        }
+
+        function renderListPegawaiMaster() {
+            const container = document.getElementById('container-list-pegawai');
+            if(!container) return;
+            container.innerHTML = '';
+            daftarKaryawan.forEach((kary, index) => {
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center bg-white border p-1.5 rounded-lg text-xs";
+                item.innerHTML = `
+                    <span><b>${kary.nama}</b> (ID: ${kary.idCard})</span>
+                    <div class="space-x-1">
+                        <button onclick="editKaryawanMaster(${index})" class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">Edit</button>
+                        <button onclick="hapusKaryawanMaster(${index})" class="bg-red-100 text-red-700 px-2 py-0.5 rounded font-semibold">Hapus</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
         }
 
         // Kompresor Gambar Anti-Lag
