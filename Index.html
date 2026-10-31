@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Nouran Coffee & Space</title>
+    <!-- Tailwind CSS CDN (Super Ringan & Cepat) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-between pb-12">
+
+    <!-- SPLASH SCREEN PWA -->
+    <div id="splash-screen" class="fixed inset-0 bg-amber-900 z-50 flex flex-col items-center justify-center text-white transition-opacity duration-500">
+        <div id="splash-logo-box" class="w-20 h-20 bg-white text-amber-900 rounded-2xl flex items-center justify-center font-bold text-3xl shadow-2xl mb-4 overflow-hidden">
+            NC
+        </div>
+        <h1 id="splash-store-name" class="text-xl font-bold tracking-wide">Nouran Coffee & Space</h1>
+        <p id="splash-tagline" class="text-xs text-amber-200 mt-1">Space & Coffee Experience</p>
+    </div>
+
+    <div>
+        <!-- Header Utama -->
+        <header class="bg-white shadow-sm sticky top-0 z-40 flex justify-between items-center px-4 py-3">
+            <div class="flex items-center space-x-3">
+                <div id="store-logo-box" class="w-10 h-10 bg-amber-800 text-white rounded-full flex items-center justify-center font-bold text-sm overflow-hidden shadow-inner">
+                    NC
+                </div>
+                <div>
+                    <h1 id="display-store-name" class="font-bold text-base leading-tight">Nouran Coffee & Space</h1>
+                    <p id="display-store-address" class="text-xs text-gray-500">Ciakar, Panongan, Tangerang</p>
+                </div>
+            </div>
+
+            <!-- Tombol Ikon Gear / Maintenance Rahasia -->
+            <button onclick="bukaModalLogin()" class="p-2 text-gray-400 hover:text-amber-800 transition focus:outline-none" title="System Configuration">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Konten Utama -->
+        <main class="max-w-md mx-auto p-4 space-y-4">
+            
+            <!-- Etalase Menu Pelanggan -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-sm font-bold text-gray-700 mb-3">Etalase Menu & Produk</h2>
+                <div id="customer-menu-grid" class="grid grid-cols-2 gap-3">
+                    <!-- Default Menu -->
+                    <div class="bg-gray-50 border rounded-xl p-2 flex flex-col justify-between">
+                        <div class="w-full h-24 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-gray-400 text-xs"><span>☕ Latte</span></div>
+                        <div>
+                            <p class="font-bold text-xs text-gray-800">Caffè Latte Artisan</p>
+                            <p class="text-[11px] text-amber-800 font-semibold">Rp 28.000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulasi Asisten AI Customer Chat -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-sm font-bold text-gray-700 mb-2">🤖 Tanya Asisten AI Kafe</h2>
+                <div class="space-y-2">
+                    <input type="text" id="customerNama" placeholder="Nama Anda (Contoh: Budi)" class="w-full px-3 py-1.5 border rounded-xl text-xs">
+                    <div class="flex space-x-2">
+                        <input type="text" id="customerTanya" placeholder="Tanya sesuatu (Cth: wifi, jam buka)..." class="w-full px-3 py-1.5 border rounded-xl text-xs">
+                        <button onclick="kirimPesanAI()" class="bg-amber-800 text-white px-4 py-1.5 rounded-xl text-xs font-semibold">Kirim</button>
+                    </div>
+                    <div id="aiChatResponse" class="bg-amber-50 p-3 rounded-xl text-xs text-amber-900 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Preview Invoice Profesional -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
+                <div class="flex justify-between items-start border-b pb-3 mb-3">
+                    <div class="flex items-center space-x-2">
+                        <div id="inv-logo-box" class="w-8 h-8 bg-amber-800 text-white rounded-lg flex items-center justify-center font-bold text-xs overflow-hidden">
+                            NC
+                        </div>
+                        <div>
+                            <h3 id="inv-store-name" class="font-bold text-gray-900">Nouran Coffee & Space</h3>
+                            <p id="inv-store-address" class="text-[11px] text-gray-500">Ciakar, Panongan, Tangerang</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">LUNAS</span>
+                        <p class="text-[10px] text-gray-400 mt-1">Inv #NRN-20261031</p>
+                    </div>
+                </div>
+
+                <!-- Tabel Item Dinamis -->
+                <table class="w-full text-left text-xs mb-3">
+                    <thead>
+                        <tr class="border-b text-gray-400">
+                            <th class="py-1">Menu</th>
+                            <th class="py-1 text-center">Qty</th>
+                            <th class="py-1 text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-items-list" class="divide-y divide-gray-100">
+                        <tr>
+                            <td class="py-2">Caffè Latte Artisan</td>
+                            <td class="py-2 text-center">1</td>
+                            <td class="py-2 text-right">Rp 28.000</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="border-t pt-2 flex justify-between font-bold text-gray-900 text-sm">
+                    <span>Total Tagihan:</span>
+                    <span class="text-amber-800">Rp 28.000</span>
+                </div>
+
+                <!-- Info Pembayaran -->
+                <div class="mt-4 pt-3 border-t text-[11px] text-gray-600 space-y-1">
+                    <p class="font-semibold text-gray-700">Metode Pembayaran:</p>
+                    <p id="inv-bank-info">Transfer Bank: BCA 1234567890 a.n Nouran</p>
+                    <div id="inv-qris-container" class="hidden text-center pt-2">
+                        <img id="inv-qris-img" src="" alt="QRIS" class="w-24 h-24 mx-auto object-contain border rounded-lg">
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-dashed text-center text-[11px] text-gray-400">
+                    Terima kasih telah berkunjung di <span id="footer-store-name">Nouran Coffee & Space</span>!
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Login Sandi Rahasia -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+            <h3 class="text-base font-bold text-gray-800 mb-1">Autorisasi Sistem Master</h3>
+            <p class="text-xs text-gray-500 mb-4">Masukkan sandi master untuk masuk ke Panel Pengaturan.</p>
+            <input type="password" id="adminPassword" placeholder="Kata sandi sistem..." class="w-full px-3 py-2 border rounded-xl text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-amber-800">
+            <div class="flex space-x-2">
+                <button onclick="tutupModalLogin()" class="w-1/2 bg-gray-100 text-gray-600 py-2 rounded-xl text-xs font-medium">Batal</button>
+                <button onclick="cekSandiAdmin()" class="w-1/2 bg-amber-800 text-white py-2 rounded-xl text-xs font-medium">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL MASTER KELENGKAPAN FULL -->
+    <div id="masterPanelModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto space-y-6 text-xs">
+            
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-gray-900 text-sm">Panel Master Kontrol & Pengelolaan Lengkap</h3>
+                <button onclick="tutupMasterPanel()" class="text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
+            </div>
+
+            <!-- Bagian 1: Branding -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">1. Identitas & Profil Toko</h4>
+                <div>
+                    <label class="block font-semibold mb-1">Nama Usaha:</label>
+                    <input type="text" id="inputStoreName" class="w-full px-3 py-2 border rounded-xl bg-white" value="Nouran Coffee & Space">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Alamat:</label>
+                    <input type="text" id="inputStoreAddress" class="w-full px-3 py-2 border rounded-xl bg-white" value="Ciakar, Panongan, Tangerang">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Tagline:</label>
+                    <input type="text" id="inputStoreTagline" class="w-full px-3 py-2 border rounded-xl bg-white" value="Space & Coffee Experience">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Upload Logo Custom:</label>
+                    <input type="file" id="inputStoreLogoFile" accept="image/*" class="w-full text-xs text-gray-500">
+                </div>
+            </div>
+
+            <!-- Bagian 2: Menu -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">2. Tambah Menu & Foto Produk</h4>
+                <input type="text" id="newMenuName" placeholder="Nama Menu" class="w-full px-3 py-2 border rounded-xl bg-white">
+                <input type="number" id="newMenuPrice" placeholder="Harga (Rp)" class="w-full px-3 py-2 border rounded-xl bg-white">
+                <input type="file" id="newMenuPhotoFile" accept="image/*" class="w-full text-xs text-gray-500">
+                <button onclick="tambahMenuDenganFoto()" class="w-full bg-amber-800 text-white py-2 rounded-xl text-xs font-semibold">+ Tambahkan Menu</button>
+            </div>
+
+            <!-- Bagian 3: Pelatihan AI & Filter Kata Baru -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">3. Pelatihan AI & Logika Respon</h4>
+                <input type="text" id="aiKeyword" placeholder="Kata Kunci (Cth: wifi, jam buka)" class="w-full px-3 py-2 border rounded-xl bg-white">
+                <input type="text" id="aiOpening" placeholder="Kata Pembuka (Cth: Halo kak)" class="w-full px-3 py-2 border rounded-xl bg-white">
+                <textarea id="aiResponse" placeholder="Jawaban Inti AI..." class="w-full px-3 py-2 border rounded-xl bg-white"></textarea>
+                <button onclick="simpanAturanAI()" class="w-full bg-gray-800 text-white py-1.5 rounded-lg text-xs font-semibold">Simpan Rule AI</button>
+                <div class="bg-amber-50 p-2 rounded-lg text-[11px] text-amber-800">
+                    <span class="font-bold">Filter Pertanyaan Asing/Baru:</span>
+                    <ul id="filter-kata-baru-list" class="list-disc pl-4 mt-1">
+                        <li>Belum ada pertanyaan baru.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bagian 4: Keuangan -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">4. Manajemen Keuangan & Pengeluaran</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="expName" placeholder="Keterangan / Karyawan" class="px-2 py-1.5 border rounded-lg bg-white">
+                    <input type="number" id="expCost" placeholder="Nominal (Rp)" class="px-2 py-1.5 border rounded-lg bg-white">
+                </div>
+                <button onclick="tambahPengeluaranAdmin()" class="w-full bg-gray-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Catat Pengeluaran</button>
+                <div id="financial-summary-box" class="text-[11px] text-gray-600 pt-1">
+                    Total Pengeluaran Bulan Ini: <span class="font-bold text-red-600">Rp 0</span> | AI Status: <span class="font-bold text-amber-800">Aman</span>
+                </div>
+            </div>
+
+            <!-- Bagian 5: Pembayaran -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">5. Pengaturan Pembayaran</h4>
+                <input type="text" id="inputBankInfo" class="w-full px-3 py-2 border rounded-xl bg-white" value="BCA 1234567890 a.n Nouran">
+                <input type="file" id="inputQrisFile" accept="image/*" class="w-full text-xs text-gray-500">
+            </div>
+
+            <div class="pt-2 flex space-x-2">
+                <button onclick="tutupMasterPanel()" class="w-1/2 bg-gray-200 text-gray-700 py-2.5 rounded-xl font-medium">Batal</button>
+                <button onclick="simpanSemuaKonfigurasi()" class="w-1/2 bg-amber-800 text-white py-2.5 rounded-xl font-medium">Simpan Semua</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watermark Pelindung Karya -->
+    <div class="py-4 text-center pointer-events-none opacity-30 text-[9px] tracking-widest text-gray-500">
+        POWERED BY ILHAM SPUNBOND SYSTEM
+    </div>
+
+    <!-- JAVASCRIPT GABUNGAN FULL KOMPLIT -->
+    <script>
+        let totalPengeluaranBulanIni = 0;
+        let daftarMenu = [
+            { nama: "Caffè Latte Artisan", harga: 28000, foto: null },
+            { nama: "Croissant Butter", harga: 22000, foto: null }
+        ];
+        let databaseAI = [
+            { keyword: "wifi", opening: "Halo kak", response: "untuk password wifi kafe kami bisa ditanyakan langsung ke kasir ya kak." },
+            { keyword: "jam buka", opening: "Baik kak", response: "kafe kami buka setiap hari mulai pukul 10.00 pagi sampai 22.00 malam." }
+        ];
+        let daftarKataBaru = [];
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 500);
+                }
+            }, 1500);
+            renderEtalaseMenu();
+        });
+
+        function bukaModalLogin() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function tutupModalLogin() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function cekSandiAdmin() {
+            const sandi = document.getElementById('adminPassword').value;
+            if (sandi === "ilham2026") {
+                tutupModalLogin();
+                document.getElementById('masterPanelModal').classList.remove('hidden');
+            } else {
+                alert("Kata sandi salah!");
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        function tutupMasterPanel() {
+            document.getElementById('masterPanelModal').classList.add('hidden');
+        }
+
+        // Kompresor Gambar Anti-Lag
+        function kompresDanUbahKeBase64(file, maxWidth, maxHeight, callback) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+                    } else {
+                        if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function tambahMenuDenganFoto() {
+            const nama = document.getElementById('newMenuName').value.trim();
+            const harga = parseInt(document.getElementById('newMenuPrice').value) || 0;
+            const fotoFile = document.getElementById('newMenuPhotoFile').files[0];
+
+            if(!nama || harga <= 0) { alert("Isi nama dan harga menu dengan benar!"); return; }
+
+            if(fotoFile) {
+                kompresDanUbahKeBase64(fotoFile, 500, 500, function(url) {
+                    simpanDanRenderMenu(nama, harga, url);
+                });
+            } else {
+                simpanDanRenderMenu(nama, harga, null);
+            }
+        }
+
+        function simpanDanRenderMenu(nama, harga, fotoUrl) {
+            daftarMenu.push({ nama, harga, foto: fotoUrl });
+            renderEtalaseMenu();
+            tambahKeTabelInvoice(nama, harga);
+            alert("Menu berhasil ditambahkan!");
+            document.getElementById('newMenuName').value = '';
+            document.getElementById('newMenuPrice').value = '';
+            document.getElementById('newMenuPhotoFile').value = '';
+        }
+
+        function renderEtalaseMenu() {
+            const grid = document.getElementById('customer-menu-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            daftarMenu.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-gray-50 border rounded-xl p-2 flex flex-col justify-between";
+                let imgHtml = `<div class="w-full h-24 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-gray-400 text-xs"><span>🍽️ Menu</span></div>`;
+                if(item.foto) {
+                    imgHtml = `<div class="w-full h-24 bg-gray-200 rounded-lg mb-2 overflow-hidden"><img src="${item.foto}" class="w-full h-full object-cover"></div>`;
+                }
+                card.innerHTML = `${imgHtml}<div><p class="font-bold text-xs text-gray-800 truncate">${item.nama}</p><p class="text-[11px] text-amber-800 font-semibold">Rp ${item.harga.toLocaleString()}</p></div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function tambahKeTabelInvoice(nama, harga) {
+            const list = document.getElementById('invoice-items-list');
+            if(!list) return;
+            const row = document.createElement('tr');
+            row.innerHTML = `<td class="py-2">${nama}</td><td class="py-2 text-center">1</td><td class="py-2 text-right">Rp ${harga.toLocaleString()}</td>`;
+            list.appendChild(row);
+        }
+
+        // Logika AI Cerdas & Filter Kata Baru
+        function simpanAturanAI() {
+            const keyword = document.getElementById('aiKeyword').value.trim().toLowerCase();
+            const opening = document.getElementById('aiOpening').value.trim();
+            const response = document.getElementById('aiResponse').value.trim();
+            if(!keyword || !response) { alert("Keyword dan Jawaban Inti wajib diisi!"); return; }
+            databaseAI.push({ keyword, opening, response });
+            alert("Aturan AI berhasil disimpan!");
+            document.getElementById('aiKeyword').value = '';
+            document.getElementById('aiOpening').value = '';
+            document.getElementById('aiResponse').value = '';
+        }
+
+        function kirimPesanAI() {
+            const nama = document.getElementById('customerNama').value.trim() || "Kak";
+            const tanya = document.getElementById('customerTanya').value.trim().toLowerCase();
+            const box = document.getElementById('aiChatResponse');
+            if(!tanya) return;
+
+            let cocok = databaseAI.find(item => tanya.includes(item.keyword));
+            box.classList.remove('hidden');
+
+            if(cocok) {
+                box.innerHTML = `<span class="font-semibold">${cocok.opening || "Halo"}, ${nama},</span> ${cocok.response}`;
+            } else {
+                if(!daftarKataBaru.includes(tanya)) {
+                    daftarKataBaru.push(tanya);
+                    updateFilterKataBaruUI();
+                }
+                box.innerHTML = `Maaf ${nama}, pertanyaannya belum dipahami sistem. Admin sudah mencatat pertanyaan baru ini untuk melatih AI!`;
+            }
+        }
+
+        function updateFilterKataBaruUI() {
+            const list = document.getElementById('filter-kata-baru-list');
+            if(!list) return;
+            list.innerHTML = '';
+            daftarKataBaru.forEach(kata => {
+                const li = document.createElement('li');
+                li.innerText = `"${kata}"`;
+                list.appendChild(li);
+            });
+        }
+
+        // Keuangan & AI Financial Advisor
+        function tambahPengeluaranAdmin() {
+            const nominal = parseInt(document.getElementById('expCost').value) || 0;
+            if(nominal <= 0) return;
+            totalPengeluaranBulanIni += nominal;
+            
+            const summaryBox = document.getElementById('financial-summary-box');
+            let statusPesan = totalPengeluaranBulanIni > 1000000 ? "Target omzet masih kurang nih, yuk genjot penjualan!" : "Keuangan stabil, pertahankan!";
+            summaryBox.innerHTML = `Total Pengeluaran: <span class="font-bold text-red-600">Rp ${totalPengeluaranBulanIni.toLocaleString()}</span> | AI Advisor: <span class="font-bold text-amber-800">${statusPesan}</span>`;
+            alert("Pengeluaran dicatat!");
+            document.getElementById('expName').value = '';
+            document.getElementById('expCost').value = '';
+        }
+
+        // Konfigurasi Master White-Label
+        function simpanSemuaKonfigurasi() {
+            const name = document.getElementById('inputStoreName').value;
+            const address = document.getElementById('inputStoreAddress').value;
+            const tagline = document.getElementById('inputStoreTagline').value;
+            const bank = document.getElementById('inputBankInfo').value;
+            const logoFile = document.getElementById('inputStoreLogoFile').files[0];
+            const qrisFile = document.getElementById('inputQrisFile').files[0];
+
+            document.getElementById('page-title').innerText = name;
+            document.getElementById('display-store-name').innerText = name;
+            document.getElementById('display-store-address').innerText = address;
+            document.getElementById('splash-store-name').innerText = name;
+            document.getElementById('splash-tagline').innerText = tagline;
+            document.getElementById('inv-store-name').innerText = name;
+            document.getElementById('inv-store-address').innerText = address;
+            document.getElementById('footer-store-name').innerText = name;
+            document.getElementById('inv-bank-info').innerText = "Transfer Bank: " + bank;
+
+            if(logoFile) {
+                kompresDanUbahKeBase64(logoFile, 300, 300, function(url) {
+                    document.getElementById('store-logo-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                    document.getElementById('inv-logo-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                    document.getElementById('splash-logo-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                });
+            }
+
+            if(qrisFile) {
+                kompresDanUbahKeBase64(qrisFile, 400, 400, function(url) {
+                    document.getElementById('inv-qris-img').src = url;
+                    document.getElementById('inv-qris-container').classList.remove('hidden');
+                });
+            }
+
+            tutupMasterPanel();
+            alert("Semua konfigurasi berhasil disimpan secara real-time!");
+        }
+    </script>
+</body>
+</html>
