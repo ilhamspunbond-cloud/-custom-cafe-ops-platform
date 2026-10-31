@@ -4,16 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Nouran Coffee & Space</title>
-    <!-- Tailwind CSS CDN (Super Ringan & Cepat) -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
             body { background: white; }
             .no-print { display: none; }
         }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        .voice-active { animation: pulse-ring 1.5s infinite; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-between pb-12">
+
+    <!-- MODAL LOGIN SHIFT ADMIN -->
+    <div id="shiftLoginModal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto font-bold text-lg">🔒</div>
+            <h3 class="text-base font-bold text-gray-900">Login Shift Admin & Kasir</h3>
+            <p class="text-xs text-gray-500">Masukkan nama kasir/admin yang bertugas untuk membuka sesi.</p>
+            <input type="text" id="shiftAdminName" placeholder="Nama Admin / Kasir..." class="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-800">
+            <input type="password" id="shiftAdminPass" placeholder="Kata Sandi Shift..." class="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-800">
+            <button onclick="mulaiSesiAdmin()" class="w-full bg-amber-800 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm hover:bg-amber-900">Mulai Shift / Masuk</button>
+        </div>
+    </div>
 
     <!-- SPLASH SCREEN PWA -->
     <div id="splash-screen" class="fixed inset-0 bg-amber-900 z-50 flex flex-col items-center justify-center text-white transition-opacity duration-500">
@@ -33,12 +51,11 @@
                 </div>
                 <div>
                     <h1 id="display-store-name" class="font-bold text-base leading-tight">Nouran Coffee & Space</h1>
-                    <p id="display-store-address" class="text-xs text-gray-500">Ciakar, Panongan, Tangerang</p>
+                    <p class="text-[11px] text-gray-500">Kasir Aktif: <span id="active-admin-label" class="font-bold text-amber-800">-</span></p>
                 </div>
             </div>
 
-            <!-- Tombol Ikon Gear / Maintenance Rahasia -->
-            <button onclick="bukaModalLogin()" class="p-2 text-gray-400 hover:text-amber-800 transition focus:outline-none" title="System Configuration">
+            <button onclick="bukaModalMaster()" class="p-2 text-gray-400 hover:text-amber-800 transition focus:outline-none" title="System Configuration">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -53,7 +70,6 @@
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-sm font-bold text-gray-700 mb-3">Etalase Menu & Produk</h2>
                 <div id="customer-menu-grid" class="grid grid-cols-2 gap-3">
-                    <!-- Default Menu -->
                     <div class="bg-gray-50 border rounded-xl p-2 flex flex-col justify-between">
                         <div class="w-full h-24 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-gray-400 text-xs"><span>☕ Latte</span></div>
                         <div>
@@ -64,17 +80,36 @@
                 </div>
             </div>
 
-            <!-- Simulasi Asisten AI Customer Chat -->
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-sm font-bold text-gray-700 mb-2">🤖 Tanya Asisten AI Kafe</h2>
-                <div class="space-y-2">
-                    <input type="text" id="customerNama" placeholder="Nama Anda (Contoh: Budi)" class="w-full px-3 py-1.5 border rounded-xl text-xs">
-                    <div class="flex space-x-2">
-                        <input type="text" id="customerTanya" placeholder="Tanya sesuatu (Cth: wifi, jam buka)..." class="w-full px-3 py-1.5 border rounded-xl text-xs">
-                        <button onclick="kirimPesanAI()" class="bg-amber-800 text-white px-4 py-1.5 rounded-xl text-xs font-semibold">Kirim</button>
+            <!-- Voice AI Assistant -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center space-y-3">
+                <div class="flex items-center justify-center space-x-2">
+                    <div id="ai-avatar-box" class="w-10 h-10 bg-amber-800 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-xs shadow">
+                        🤖
                     </div>
-                    <div id="aiChatResponse" class="bg-amber-50 p-3 rounded-xl text-xs text-amber-900 hidden"></div>
+                    <div class="text-left">
+                        <h3 class="text-xs font-bold text-gray-800">Asisten Suara AI Kafe</h3>
+                        <p class="text-[10px] text-gray-400">Tekan tombol biru untuk mulai bicara</p>
+                    </div>
                 </div>
+
+                <div class="py-2 flex justify-center">
+                    <button id="voiceBtn" onclick="toggleVoiceAI()" class="w-16 h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition transform active:scale-95 focus:outline-none">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p id="voiceStatusText" class="text-xs font-medium text-blue-600 h-4">Ketuk ikon untuk berbicara...</p>
+                <div id="aiVoiceResponse" class="bg-blue-50 p-3 rounded-xl text-xs text-blue-900 hidden text-left"></div>
+            </div>
+
+            <!-- Absensi Karyawan Berbasis ID Card / NIK + GPS + Wajah -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <h3 class="text-xs font-bold text-gray-700 text-center">Absensi Karyawan (Scan / ID Card & Selfie)</h3>
+                <input type="text" id="scanInputId" placeholder="Masukkan ID Card / NIK Karyawan..." class="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                <button onclick="prosesAbsenDenganID()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm transition">
+                    📸 Verifikasi ID & Ambil Foto Wajah
+                </button>
             </div>
 
             <!-- Preview Invoice Profesional -->
@@ -91,11 +126,10 @@
                     </div>
                     <div class="text-right">
                         <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">LUNAS</span>
-                        <p class="text-[10px] text-gray-400 mt-1">Inv #NRN-20261031</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Admin: <span id="inv-admin-name" class="font-semibold">-</span></p>
                     </div>
                 </div>
 
-                <!-- Tabel Item Dinamis -->
                 <table class="w-full text-left text-xs mb-3">
                     <thead>
                         <tr class="border-b text-gray-400">
@@ -118,7 +152,6 @@
                     <span class="text-amber-800">Rp 28.000</span>
                 </div>
 
-                <!-- Info Pembayaran -->
                 <div class="mt-4 pt-3 border-t text-[11px] text-gray-600 space-y-1">
                     <p class="font-semibold text-gray-700">Metode Pembayaran:</p>
                     <p id="inv-bank-info">Transfer Bank: BCA 1234567890 a.n Nouran</p>
@@ -134,31 +167,32 @@
         </main>
     </div>
 
-    <!-- Modal Login Sandi Rahasia -->
-    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
-            <h3 class="text-base font-bold text-gray-800 mb-1">Autorisasi Sistem Master</h3>
-            <p class="text-xs text-gray-500 mb-4">Masukkan sandi master untuk masuk ke Panel Pengaturan.</p>
-            <input type="password" id="adminPassword" placeholder="Kata sandi sistem..." class="w-full px-3 py-2 border rounded-xl text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-amber-800">
-            <div class="flex space-x-2">
-                <button onclick="tutupModalLogin()" class="w-1/2 bg-gray-100 text-gray-600 py-2 rounded-xl text-xs font-medium">Batal</button>
-                <button onclick="cekSandiAdmin()" class="w-1/2 bg-amber-800 text-white py-2 rounded-xl text-xs font-medium">Masuk</button>
-            </div>
-        </div>
-    </div>
-
     <!-- PANEL MASTER KELENGKAPAN FULL -->
     <div id="masterPanelModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto space-y-6 text-xs">
             
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-gray-900 text-sm">Panel Master Kontrol & Pengelolaan Lengkap</h3>
+                <h3 class="font-bold text-gray-900 text-sm">Panel Master Kontrol & Manajemen Karyawan</h3>
                 <button onclick="tutupMasterPanel()" class="text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
             </div>
 
-            <!-- Bagian 1: Branding -->
+            <!-- Manajemen Karyawan / ID Card & NIK -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">1. Identitas & Profil Toko</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">1. Pendaftaran Data Karyawan (ID Card / NIK)</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="regNamaKaryawan" placeholder="Nama Karyawan" class="px-2 py-1.5 border rounded-lg bg-white">
+                    <input type="text" id="regIdKaryawan" placeholder="Nomor ID / NIK" class="px-2 py-1.5 border rounded-lg bg-white">
+                </div>
+                <button onclick="tambahKaryawanMaster()" class="w-full bg-amber-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Daftarkan Pegawai</button>
+                <div id="list-pegawai-box" class="text-[11px] text-gray-600 pt-1">
+                    <span class="font-semibold">Pegawai Terdaftar:</span> 
+                    <span id="label-jumlah-pegawai" class="text-amber-800 font-bold">0 Pegawai</span>
+                </div>
+            </div>
+
+            <!-- Branding -->
+            <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">2. Identitas, Profil & Foto AI Custom</h4>
                 <div>
                     <label class="block font-semibold mb-1">Nama Usaha:</label>
                     <input type="text" id="inputStoreName" class="w-full px-3 py-2 border rounded-xl bg-white" value="Nouran Coffee & Space">
@@ -168,55 +202,49 @@
                     <input type="text" id="inputStoreAddress" class="w-full px-3 py-2 border rounded-xl bg-white" value="Ciakar, Panongan, Tangerang">
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Tagline:</label>
-                    <input type="text" id="inputStoreTagline" class="w-full px-3 py-2 border rounded-xl bg-white" value="Space & Coffee Experience">
+                    <label class="block font-semibold mb-1">Upload Logo Toko:</label>
+                    <input type="file" id="inputStoreLogoFile" accept="image/*" class="w-full text-xs text-gray-500">
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Upload Logo Custom:</label>
-                    <input type="file" id="inputStoreLogoFile" accept="image/*" class="w-full text-xs text-gray-500">
+                    <label class="block font-semibold mb-1">Upload Foto AI Custom (Avatar Asisten):</label>
+                    <input type="file" id="inputAiAvatarFile" accept="image/*" class="w-full text-xs text-gray-500">
                 </div>
             </div>
 
-            <!-- Bagian 2: Menu -->
+            <!-- Menu -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">2. Tambah Menu & Foto Produk</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">3. Tambah Menu & Foto Produk</h4>
                 <input type="text" id="newMenuName" placeholder="Nama Menu" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <input type="number" id="newMenuPrice" placeholder="Harga (Rp)" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <input type="file" id="newMenuPhotoFile" accept="image/*" class="w-full text-xs text-gray-500">
                 <button onclick="tambahMenuDenganFoto()" class="w-full bg-amber-800 text-white py-2 rounded-xl text-xs font-semibold">+ Tambahkan Menu</button>
             </div>
 
-            <!-- Bagian 3: Pelatihan AI & Filter Kata Baru -->
+            <!-- Pelatihan AI -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">3. Pelatihan AI & Logika Respon</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">4. Pelatihan AI & Logika Respon Suara</h4>
                 <input type="text" id="aiKeyword" placeholder="Kata Kunci (Cth: wifi, jam buka)" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <input type="text" id="aiOpening" placeholder="Kata Pembuka (Cth: Halo kak)" class="w-full px-3 py-2 border rounded-xl bg-white">
                 <textarea id="aiResponse" placeholder="Jawaban Inti AI..." class="w-full px-3 py-2 border rounded-xl bg-white"></textarea>
                 <button onclick="simpanAturanAI()" class="w-full bg-gray-800 text-white py-1.5 rounded-lg text-xs font-semibold">Simpan Rule AI</button>
-                <div class="bg-amber-50 p-2 rounded-lg text-[11px] text-amber-800">
-                    <span class="font-bold">Filter Pertanyaan Asing/Baru:</span>
-                    <ul id="filter-kata-baru-list" class="list-disc pl-4 mt-1">
-                        <li>Belum ada pertanyaan baru.</li>
-                    </ul>
-                </div>
             </div>
 
-            <!-- Bagian 4: Keuangan -->
+            <!-- Keuangan -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">4. Manajemen Keuangan & Pengeluaran</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">5. Manajemen Keuangan & Pengeluaran</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="expName" placeholder="Keterangan / Karyawan" class="px-2 py-1.5 border rounded-lg bg-white">
                     <input type="number" id="expCost" placeholder="Nominal (Rp)" class="px-2 py-1.5 border rounded-lg bg-white">
                 </div>
                 <button onclick="tambahPengeluaranAdmin()" class="w-full bg-gray-800 text-white py-1.5 rounded-lg text-xs font-semibold">+ Catat Pengeluaran</button>
                 <div id="financial-summary-box" class="text-[11px] text-gray-600 pt-1">
-                    Total Pengeluaran Bulan Ini: <span class="font-bold text-red-600">Rp 0</span> | AI Status: <span class="font-bold text-amber-800">Aman</span>
+                    Total Pengeluaran Bulan Ini: <span class="font-bold text-red-600">Rp 0</span> | AI Advisor: <span class="font-bold text-amber-800">Aman</span>
                 </div>
             </div>
 
-            <!-- Bagian 5: Pembayaran -->
+            <!-- Pembayaran -->
             <div class="space-y-3 bg-gray-50 p-3 rounded-xl border">
-                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">5. Pengaturan Pembayaran</h4>
+                <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wide">6. Pengaturan Pembayaran</h4>
                 <input type="text" id="inputBankInfo" class="w-full px-3 py-2 border rounded-xl bg-white" value="BCA 1234567890 a.n Nouran">
                 <input type="file" id="inputQrisFile" accept="image/*" class="w-full text-xs text-gray-500">
             </div>
@@ -236,6 +264,11 @@
     <!-- JAVASCRIPT GABUNGAN FULL KOMPLIT -->
     <script>
         let totalPengeluaranBulanIni = 0;
+        let adminAktif = "Kasir Umum";
+        let daftarKaryawan = [
+            { nama: "Budi Santoso", idCard: "KRY001" },
+            { nama: "Siti Aminah", idCard: "KRY002" }
+        ];
         let daftarMenu = [
             { nama: "Caffè Latte Artisan", harga: 28000, foto: null },
             { nama: "Croissant Butter", harga: 22000, foto: null }
@@ -244,7 +277,11 @@
             { keyword: "wifi", opening: "Halo kak", response: "untuk password wifi kafe kami bisa ditanyakan langsung ke kasir ya kak." },
             { keyword: "jam buka", opening: "Baik kak", response: "kafe kami buka setiap hari mulai pukul 10.00 pagi sampai 22.00 malam." }
         ];
-        let daftarKataBaru = [];
+
+        // Titik Koordinat Pusat Kafe (Contoh: Area Ciakar, Panongan, Tangerang)
+        const KAFE_LATITUDE = -6.251234; 
+        const KAFE_LONGITUDE = 106.543210; 
+        const MAKS_JARAK_METER = 50; 
 
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -255,31 +292,48 @@
                 }
             }, 1500);
             renderEtalaseMenu();
+            updateLabelJumlahPegawai();
         });
 
-        function bukaModalLogin() {
-            document.getElementById('loginModal').classList.remove('hidden');
-            document.getElementById('adminPassword').focus();
+        function mulaiSesiAdmin() {
+            const nama = document.getElementById('shiftAdminName').value.trim();
+            if(!nama) { alert("Masukkan nama admin/kasir!"); return; }
+            
+            adminAktif = nama;
+            document.getElementById('active-admin-label').innerText = adminAktif;
+            document.getElementById('inv-admin-name').innerText = adminAktif;
+            document.getElementById('shiftLoginModal').classList.add('hidden');
         }
 
-        function tutupModalLogin() {
-            document.getElementById('loginModal').classList.add('hidden');
-            document.getElementById('adminPassword').value = '';
-        }
-
-        function cekSandiAdmin() {
-            const sandi = document.getElementById('adminPassword').value;
+        function bukaModalMaster() {
+            const sandi = prompt("Masukkan sandi master sistem:");
             if (sandi === "ilham2026") {
-                tutupModalLogin();
                 document.getElementById('masterPanelModal').classList.remove('hidden');
-            } else {
+            } else if (sandi !== null) {
                 alert("Kata sandi salah!");
-                document.getElementById('adminPassword').value = '';
             }
         }
 
         function tutupMasterPanel() {
             document.getElementById('masterPanelModal').classList.add('hidden');
+        }
+
+        // Tambah Karyawan Baru
+        function tambahKaryawanMaster() {
+            const nama = document.getElementById('regNamaKaryawan').value.trim();
+            const idCard = document.getElementById('regIdKaryawan').value.trim();
+            if(!nama || !idCard) { alert("Nama dan ID Card / NIK wajib diisi!"); return; }
+
+            daftarKaryawan.push({ nama, idCard });
+            updateLabelJumlahPegawai();
+            alert(`Karyawan ${nama} (${idCard}) berhasil didaftarkan ke sistem!`);
+            document.getElementById('regNamaKaryawan').value = '';
+            document.getElementById('regIdKaryawan').value = '';
+        }
+
+        function updateLabelJumlahPegawai() {
+            const label = document.getElementById('label-jumlah-pegawai');
+            if(label) label.innerText = `${daftarKaryawan.length} Pegawai Terdaftar`;
         }
 
         // Kompresor Gambar Anti-Lag
@@ -311,7 +365,7 @@
             const harga = parseInt(document.getElementById('newMenuPrice').value) || 0;
             const fotoFile = document.getElementById('newMenuPhotoFile').files[0];
 
-            if(!nama || harga <= 0) { alert("Isi nama dan harga menu dengan benar!"); return; }
+            if(!nama || harga <= 0) { alert("Isi nama dan harga menu!"); return; }
 
             if(fotoFile) {
                 kompresDanUbahKeBase64(fotoFile, 500, 500, function(url) {
@@ -356,71 +410,201 @@
             list.appendChild(row);
         }
 
-        // Logika AI Cerdas & Filter Kata Baru
+        // Voice AI Assistant
+        function toggleVoiceAI() {
+            const btn = document.getElementById('voiceBtn');
+            const statusText = document.getElementById('voiceStatusText');
+            const responseBox = document.getElementById('aiVoiceResponse');
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Browser Anda tidak mendukung asisten suara otomatis. Gunakan Google Chrome.");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'id-ID';
+            recognition.interimResults = false;
+
+            btn.classList.add('voice-active', 'bg-blue-800');
+            statusText.innerText = "Mendengarkan suara Anda...";
+            responseBox.classList.add('hidden');
+
+            recognition.onresult = function(event) {
+                const textUcap = event.results[0][0].transcript.toLowerCase();
+                statusText.innerText = `Anda bilang: "${textUcap}"`;
+                prosesResponAI(textUcap);
+                btn.classList.remove('voice-active', 'bg-blue-800');
+            };
+
+            recognition.onerror = function() {
+                statusText.innerText = "Gagal mendeteksi suara. Coba lagi.";
+                btn.classList.remove('voice-active', 'bg-blue-800');
+            };
+
+            recognition.onend = function() {
+                btn.classList.remove('voice-active', 'bg-blue-800');
+            };
+
+            recognition.start();
+        }
+
+        function prosesResponAI(ucapan) {
+            const responseBox = document.getElementById('aiVoiceResponse');
+            let cocok = databaseAI.find(item => ucapan.includes(item.keyword));
+            responseBox.classList.remove('hidden');
+
+            let teksJawab = "";
+            if(cocok) {
+                teksJawab = `${cocok.opening || "Halo"}, ${cocok.response}`;
+            } else {
+                teksJawab = `Maaf, pertanyaan "${ucapan}" belum dipahami sistem. Admin akan segera melatih AI ini.`;
+            }
+
+            responseBox.innerHTML = `<span class="font-bold">AI Asisten:</span> ${teksJawab}`;
+
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(teksJawab);
+                utterance.lang = 'id-ID';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
         function simpanAturanAI() {
             const keyword = document.getElementById('aiKeyword').value.trim().toLowerCase();
             const opening = document.getElementById('aiOpening').value.trim();
             const response = document.getElementById('aiResponse').value.trim();
-            if(!keyword || !response) { alert("Keyword dan Jawaban Inti wajib diisi!"); return; }
+            if(!keyword || !response) { alert("Keyword dan Jawaban wajib diisi!"); return; }
             databaseAI.push({ keyword, opening, response });
-            alert("Aturan AI berhasil disimpan!");
+            alert("Aturan AI berhasil ditambah!");
             document.getElementById('aiKeyword').value = '';
             document.getElementById('aiOpening').value = '';
             document.getElementById('aiResponse').value = '';
         }
 
-        function kirimPesanAI() {
-            const nama = document.getElementById('customerNama').value.trim() || "Kak";
-            const tanya = document.getElementById('customerTanya').value.trim().toLowerCase();
-            const box = document.getElementById('aiChatResponse');
-            if(!tanya) return;
+        // Proses Validasi ID Card & Buka Kamera Absen Wajah
+        function prosesAbsenDenganID() {
+            const idInput = document.getElementById('scanInputId').value.trim();
+            if(!idInput) { alert("Masukkan ID Card / NIK Anda terlebih dahulu!"); return; }
 
-            let cocok = databaseAI.find(item => tanya.includes(item.keyword));
-            box.classList.remove('hidden');
-
-            if(cocok) {
-                box.innerHTML = `<span class="font-semibold">${cocok.opening || "Halo"}, ${nama},</span> ${cocok.response}`;
-            } else {
-                if(!daftarKataBaru.includes(tanya)) {
-                    daftarKataBaru.push(tanya);
-                    updateFilterKataBaruUI();
-                }
-                box.innerHTML = `Maaf ${nama}, pertanyaannya belum dipahami sistem. Admin sudah mencatat pertanyaan baru ini untuk melatih AI!`;
+            const karyawan = daftarKaryawan.find(k => k.idCard.toLowerCase() === idInput.toLowerCase());
+            if(!karyawan) {
+                alert("ID Card / NIK tidak terdaftar dalam database karyawan!");
+                return;
             }
+
+            bukaKameraAbsen(karyawan.nama, karyawan.idCard);
         }
 
-        function updateFilterKataBaruUI() {
-            const list = document.getElementById('filter-kata-baru-list');
-            if(!list) return;
-            list.innerHTML = '';
-            daftarKataBaru.forEach(kata => {
-                const li = document.createElement('li');
-                li.innerText = `"${kata}"`;
-                list.appendChild(li);
-            });
+        function bukaKameraAbsen(namaKaryawan, idCard) {
+            const modalKamera = document.createElement('div');
+            modalKamera.id = 'modalKameraAbsen';
+            modalKamera.className = "fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col items-center justify-center p-4 text-white";
+            modalKamera.innerHTML = `
+                <h3 class="text-sm font-bold mb-1">Absensi: ${namaKaryawan}</h3>
+                <p class="text-[11px] text-gray-300 mb-3">ID: ${idCard} - Posisikan wajah Anda di kamera</p>
+                <div class="w-64 h-80 bg-black rounded-2xl overflow-hidden relative border-2 border-emerald-500 mb-4">
+                    <video id="videoWebcam" autoplay playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <div class="flex space-x-3 w-full max-w-xs">
+                    <button onclick="tutupKameraAbsen()" class="w-1/2 bg-gray-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
+                    <button onclick="ambilFotoDanKirimAbsen('${namaKaryawan}', '${idCard}')" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 py-2.5 rounded-xl text-xs font-semibold">Ambil & Absen</button>
+                </div>
+            `;
+            document.body.appendChild(modalKamera);
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+                .then(stream => {
+                    window.localStream = stream;
+                    document.getElementById('videoWebcam').srcObject = stream;
+                })
+                .catch(err => {
+                    alert("Gagal mengakses kamera. Izinkan akses kamera pada browser.");
+                    tutupKameraAbsen();
+                });
         }
 
-        // Keuangan & AI Financial Advisor
+        function tutupKameraAbsen() {
+            if (window.localStream) {
+                window.localStream.getTracks().forEach(track => track.stop());
+            }
+            const modal = document.getElementById('modalKameraAbsen');
+            if (modal) modal.remove();
+        }
+
+        function ambilFotoDanKirimAbsen(namaKaryawan, idCard) {
+            const video = document.getElementById('videoWebcam');
+            if (!video) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 300; 
+            canvas.height = 400; 
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const compressedPhotoUrl = canvas.toDataURL('image/jpeg', 0.6);
+            tutupKameraAbsen();
+            verifikasiGPSDanSimpanAbsen(namaKaryawan, idCard, compressedPhotoUrl);
+        }
+
+        function hitungJarakGPS(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; 
+        }
+
+        function verifikasiGPSDanSimpanAbsen(namaKaryawan, idCard, fotoBase64) {
+            if (!navigator.geolocation) {
+                alert("GPS tidak didukung di perangkat ini.");
+                return;
+            }
+
+            alert("Memverifikasi lokasi GPS kafe...");
+
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const jarak = hitungJarakGPS(userLat, userLon, KAFE_LATITUDE, KAFE_LONGITUDE);
+
+                if (jarak <= MAKS_JARAK_METER) {
+                    const waktuAbsen = new Date().toLocaleTimeString();
+                    alert(`Absensi Berhasil!\nHalo ${namaKaryawan} (${idCard}), kehadiran Anda tercatat pada pukul ${waktuAbsen}.\nLokasi valid (${Math.round(jarak)} meter dari kafe).`);
+                    document.getElementById('scanInputId').value = '';
+                } else {
+                    alert(`Absensi Ditolak! Anda berada di luar radius kafe (${Math.round(jarak)} meter). Harap lakukan absensi di area kafe.`);
+                }
+            }, function(error) {
+                alert("Gagal mendeteksi lokasi GPS. Pastikan izin GPS aktif.");
+            }, { enableHighAccuracy: true });
+        }
+
+        // Keuangan
         function tambahPengeluaranAdmin() {
             const nominal = parseInt(document.getElementById('expCost').value) || 0;
             if(nominal <= 0) return;
             totalPengeluaranBulanIni += nominal;
             
             const summaryBox = document.getElementById('financial-summary-box');
-            let statusPesan = totalPengeluaranBulanIni > 1000000 ? "Target omzet masih kurang nih, yuk genjot penjualan!" : "Keuangan stabil, pertahankan!";
+            let statusPesan = totalPengeluaranBulanIni > 1000000 ? "Target omzet masih kurang nih, yuk genjot penjualan!" : "Keuangan stabil!";
             summaryBox.innerHTML = `Total Pengeluaran: <span class="font-bold text-red-600">Rp ${totalPengeluaranBulanIni.toLocaleString()}</span> | AI Advisor: <span class="font-bold text-amber-800">${statusPesan}</span>`;
             alert("Pengeluaran dicatat!");
             document.getElementById('expName').value = '';
             document.getElementById('expCost').value = '';
         }
 
-        // Konfigurasi Master White-Label
+        // Konfigurasi Master White-Label & Custom Avatar AI
         function simpanSemuaKonfigurasi() {
             const name = document.getElementById('inputStoreName').value;
             const address = document.getElementById('inputStoreAddress').value;
             const tagline = document.getElementById('inputStoreTagline').value;
             const bank = document.getElementById('inputBankInfo').value;
             const logoFile = document.getElementById('inputStoreLogoFile').files[0];
+            const aiAvatarFile = document.getElementById('inputAiAvatarFile').files[0];
             const qrisFile = document.getElementById('inputQrisFile').files[0];
 
             document.getElementById('page-title').innerText = name;
@@ -438,6 +622,12 @@
                     document.getElementById('store-logo-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
                     document.getElementById('inv-logo-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
                     document.getElementById('splash-logo-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                });
+            }
+
+            if(aiAvatarFile) {
+                kompresDanUbahKeBase64(aiAvatarFile, 200, 200, function(url) {
+                    document.getElementById('ai-avatar-box').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
                 });
             }
 
